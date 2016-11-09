@@ -187,6 +187,9 @@ class PyPIMatch(Match):
             self.package, self.version = package.strip().split("==")
         except ValueError:
             raise NotMatching
+
+        self.package = self.package.lower()
+
         self.path = path.strip()
         self.element = element.strip() if element else None
 
@@ -197,7 +200,7 @@ class PyPIMatch(Match):
         return (
             "{match.package} == {match.version}{vs_match} "
             "@ {match.path}:{element} "
-            "(from {match.filename}:{match.lineno})".format(
+            "{match._str_partial}".format(
                 match=self,
                 vs_match=" vs {}".format(self.other_version)
                          if self.other_version else "",

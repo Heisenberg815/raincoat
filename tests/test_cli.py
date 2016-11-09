@@ -1,6 +1,6 @@
 from raincoat import main
 
-from .test_raincoat import get_match
+from .test_match_pypi import get_match
 
 
 def test_cli(cli_runner, mocker):

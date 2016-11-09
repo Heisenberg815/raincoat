@@ -1,4 +1,5 @@
 import difflib
+from importlib import import_module
 
 
 class NotMatching(ValueError):
@@ -16,7 +17,12 @@ class Match(object):
         self.lineno = lineno
 
     def __str__(self):
-        return "Match in {}:{}".format(self.filename, self.lineno)
+        return "Match {match._str_partial}".format(match=self)
+
+    @property
+    def _str_partial(self):
+        return "(from {match.filename}:{match.lineno})".format(match=self)
+
 
     @classmethod
     def from_comment(cls, match_type, filename, lineno, **kwargs):
@@ -26,7 +32,7 @@ class Match(object):
         """
         try:
             return cls.subclasses[match_type](filename, lineno, **kwargs)
-        except KeyError:
+        except (KeyError, TypeError):
             raise NotMatching
 
     checker = NotImplemented
@@ -55,9 +61,14 @@ class Checker(object):
     def add_error(self, error, match):
         self.errors.append((error, match))
 
+    def check(self, matches):
+        raise NotImplementedError
 
-from .pypi import PyPIMatch  # noqa
+
 Match.subclasses = {
     match_class.match_type: match_class
-    for match_class in [PyPIMatch]
+    for match_class in [
+        import_module("raincoat.match.pypi").PyPIMatch,
+        import_module("raincoat.match.django").DjangoMatch,
+    ]
 }

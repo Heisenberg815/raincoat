@@ -1,7 +1,7 @@
 from raincoat.raincoat import Raincoat
 from raincoat.match import Match
 
-from .test_match import get_match
+from .test_match_pypi import get_match
 
 
 def test_raincoat(mocker):
